@@ -113,6 +113,30 @@ public class HandlerShould
         isAwaited.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task TestThatSaveIsAwaitedVersion3()
+    {
+        // Arrange
+
+        var repo = Substitute.For<IRepository>();
+        var sut = new Handler(repo);
+        repo.Save()
+            .Returns(async _ =>
+            {
+                await Task.Yield();
+                throw new Exception();
+            });
+
+        // Act
+
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+        {
+            await sut.ExecuteSave();
+        });
+    }
+
+
     public interface ITestInterface
     {
         void AwaitA();
